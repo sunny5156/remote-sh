@@ -230,4 +230,69 @@ router.all('/script/run/:name/:sign', async ctx => {
   }
 });
 
+// 查看脚本
+router.all('/script/show/:name/:sign', async ctx => {
+  const { name, sign } = ctx.params;
+  if (typeof name !== 'string' || !regexScriptName.test(name)) {
+    ctx.body = {
+      error: regexScriptNameErrorText,
+    };
+    return;
+  }
+  if (typeof sign !== 'string') {
+    ctx.body = {
+      error: 'Invalid signature.',
+    };
+    return;
+  }
+  if (sign !== getSignature(name)) {
+    const key = getUserIp(ctx);
+    if (!opFrequencyTest(key, 60, 10)) {
+      // 失败次数过多IP加入黑名单
+      blackList.set(key, true, YlMemCache.ONE_HOUR);
+    }
+    ctx.body = {
+      error: 'Invalid signature.',
+    };
+    return;
+  }
+  const filePath = getScriptFilePath(name);
+  if (fs.existsSync(filePath)) {
+    // await waitUntill(() => !runningScriptNames.has(name), 200, 3600 * 1000);
+    // runningScriptNames.add(name);
+    // const readable = new Readable();
+    // readable._read = () => {};
+    // const handle = spawn('sh', [filePath]);
+    // handle.stderr.on('data', data => {
+    //   readable.push(data);
+    // });
+    // handle.stdout.on('data', data => {
+    //   readable.push(data);
+    // });
+    // handle.on('error', () => {
+    //   runningScriptNames.delete(name);
+    //   readable.push('\nError occured.\n');
+    //   readable.push(null);
+    // });
+    // handle.on('close', () => {
+    //   runningScriptNames.delete(name);
+    //   readable.push('\nFinished.\n');
+    //   readable.push(null);
+    // });
+    var readable = fs.readFileSync(filePath, 'utf8');
+    // fs.readFile(filePath, 'utf8', function(err, datastr) {
+    //   // console.log('读取成功后的' + err);
+    //   console.log('读取成功后的' + datastr);
+    //   readable = datastr;
+    // });
+
+    ctx.body = readable;
+    ctx.type = 'text';
+  } else {
+    ctx.body = {
+      error: 'File not exists.',
+    };
+  }
+});
+
 module.exports = router;
