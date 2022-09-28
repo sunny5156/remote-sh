@@ -279,13 +279,7 @@ router.all('/script/show/:name/:sign', async ctx => {
     //   readable.push('\nFinished.\n');
     //   readable.push(null);
     // });
-    var readable = fs.readFileSync(filePath, 'utf8');
-    // fs.readFile(filePath, 'utf8', function(err, datastr) {
-    //   // console.log('读取成功后的' + err);
-    //   console.log('读取成功后的' + datastr);
-    //   readable = datastr;
-    // });
-
+    const readable = fs.readFileSync(filePath, 'utf8');
     ctx.body = readable;
     ctx.type = 'text';
   } else {
