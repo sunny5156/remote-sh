@@ -9,7 +9,7 @@ const dirPathScripts = require('path').resolve(__dirname, '../shell_scripts');
 
 fs.ensureDirSync(dirPathScripts); // 保证脚本目录的存在
 
-const regexScriptName = /^[\w.\u4e00-\u9fa5]{0,63}\.sh$/;
+const regexScriptName = /^[\w.-\u4e00-\u9fa5]{0,63}\.sh$/;
 const regexScriptNameErrorText = `Invalid script name. Name must match ${regexScriptName.toString()}`;
 const blackList = new YlMemCache('blackList'); // ip 黑名单
 
